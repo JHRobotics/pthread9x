@@ -66,6 +66,7 @@ BOOL init_tryentercritsec()
 }
 
 #ifdef __GNUC__
+# ifdef __i386__
 
 BOOL WINAPI TryEnterCrst(CRIT_SECT* crit);
 
@@ -102,7 +103,9 @@ __asm__(".text\n\t"
 		"xorl %eax,%eax\n\t"
 		"ret $4\n\t"
 		);
-
+# else
+#  define NATIVE_ONLY
+# endif
 #else
 
 __declspec(naked) BOOL WINAPI TryEnterCrst(CRIT_SECT* crit)

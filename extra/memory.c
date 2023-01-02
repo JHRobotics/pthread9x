@@ -8,7 +8,7 @@
 #include <cpuid.h>
 
 // include SSE2 intrinsics require some target switching
-#if 0
+#ifdef MEM_COPY_SSE2
 #pragma GCC push_options
 #pragma GCC target ("arch=core2")
 #include <emmintrin.h>
@@ -32,16 +32,10 @@
 typedef void(*memcpy_func)(void *dst, void *src, size_t size);
 typedef void(*zeromem_func)(void *dst, size_t size);
 
-static HANDLE glHeaps[4] = {NULL, NULL, NULL, NULL};
-
 #define AROUND(_s, _a) _s = ((_s + _a - 1) & (~(size_t)(_a - 1)))
 
-typedef struct _memblk_t
-{
-	HANDLE heap;
-	uint8_t *heap_ptr;
-	size_t mem_size;
-} memblk_t;
+#ifndef DEFAULT_HEAP
+static HANDLE glHeaps[4] = {NULL, NULL, NULL, NULL};
 
 static HANDLE NewHeap()
 {
@@ -50,9 +44,18 @@ static HANDLE NewHeap()
 			
 	return HeapCreate(0, si.dwPageSize*32, 0);
 }
+#endif
+
+typedef struct _memblk_t
+{
+	HANDLE heap;
+	uint8_t *heap_ptr;
+	size_t mem_size;
+} memblk_t;
 
 static HANDLE GetHeap(size_t memsize)
 {
+#ifndef DEFAULT_HEAP
 	int sel = 3;
 	
 	if(memsize < MEM_R2)
@@ -74,6 +77,9 @@ static HANDLE GetHeap(size_t memsize)
 	}
 	
 	return glHeaps[sel];
+#else
+ 	return GetProcessHeap();
+#endif
 }
 
 static void memcpy_c(void *dst, void *src, size_t size)
@@ -104,7 +110,7 @@ static void zeromem_c(void *dst, size_t size)
 static memcpy_func memcpy_fast = memcpy_c;
 static zeromem_func zeromem_fast = zeromem_c;
 
-#if 0
+#ifdef MEM_COPY_SSE2
 
 #pragma GCC push_options
 #pragma GCC target ("arch=core2")
@@ -141,9 +147,11 @@ static void zeromem_sse2(void *dst, size_t size)
 
 void crt_enable_sse2()
 {
-#if MEM_ALIGN >= 16
-//	memcpy_fast = memcpy_sse2;
-//	zeromem_fast = zeromem_sse2;
+#ifdef MEM_COPY_SSE2
+# if MEM_ALIGN >= 16
+	memcpy_fast = memcpy_sse2;
+	zeromem_fast = zeromem_sse2;
+# endif
 #endif
 }
 

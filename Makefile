@@ -9,7 +9,7 @@ else
   CONFIG=config.mk
 endif
 
-$(info $(CONFIG))
+$(info Using config: $(CONFIG))
 
 include $(CONFIG)
 
@@ -32,6 +32,18 @@ else
 
   ifdef NEW_ALLOC
     DEFS += -DNEW_ALLOC
+  endif
+  
+  ifdef DEFAULT_HEAP
+    DEFS += -DDEFAULT_HEAP
+  endif
+  
+  ifdef MEM_ALIGN
+    DEFS += -DMEM_ALIGN=$(MEM_ALIGN)
+  endif
+  
+  ifdef MEM_COPY_SSE2
+  	DEFS += -DMEM_COPY_SSE2
   endif
 
   ifdef SPEED
