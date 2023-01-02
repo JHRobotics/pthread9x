@@ -1,0 +1,11 @@
+# syncthing
+/.stfolder/
+/.stignore
+
+# generated and temporary files
+*.o
+*.bak
+*.tmp
+*.gen
+*.exe
+*.a
