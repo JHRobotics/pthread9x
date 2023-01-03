@@ -33,6 +33,9 @@ BOOL WINAPI IsProcessorFeaturePresent(DWORD ProcessorFeature)
 	return IsProcessorFeaturePresent95(ProcessorFeature);
 }
 
+/* Don't use this on mingw 4.x.x */
+#if __GNUC__ > 4
+
 void __fastfail(unsigned int code);
 
 void __cdecl __attribute__((__noreturn__)) __chk_fail(void) {
@@ -43,3 +46,5 @@ void __cdecl __attribute__((__noreturn__)) __chk_fail(void) {
     __builtin_unreachable();
   }
 }
+
+#endif
