@@ -45,6 +45,10 @@ else
   ifdef MEM_COPY_SSE2
   	DEFS += -DMEM_COPY_SSE2
   endif
+  
+  ifdef CS_NATIVE_ONLY
+    DEFS += -DCS_NATIVE_ONLY
+  endif
 
   ifdef SPEED
     CFLAGS = -std=gnu99 -O3 -fno-exceptions $(TUNE) $(INCLUDE) -DNDEBUG $(DEFS)

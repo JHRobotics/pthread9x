@@ -104,7 +104,7 @@ __asm__(".text\n\t"
 		"ret $4\n\t"
 		);
 # else
-#  define NATIVE_ONLY
+#  define CS_NATIVE_ONLY
 # endif
 #else
 
@@ -150,17 +150,15 @@ typedef void (WINAPI *ecs_f)(CRITICAL_SECTION* cs);
 static tecs_f tecs_p = NULL;
 static ecs_f  ecs_p  = NULL;
 
-//#define NATIVE_ONLY
-
 BOOL WINAPI TryEnterCriticalSectionNative(CRITICAL_SECTION* cs)
 {
 	DWORD GV = GetVersion();
 	DWORD major = (DWORD)(LOBYTE(LOWORD(GV)));
   DWORD minor = (DWORD)(HIBYTE(LOWORD(GV)));
 	
-	if(major == 4)
+	if(major <= 4)
 	{
-#ifndef NATIVE_ONLY
+#ifndef CS_NATIVE_ONLY
 		if(minor == 10 || minor == 90)
 		{
 			WIN_CRITICAL_SECTION* mycs = (WIN_CRITICAL_SECTION*) cs;

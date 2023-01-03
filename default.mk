@@ -22,6 +22,9 @@ DEFAULT_HEAP=1
 # TIP: You can call crt_sse2_is_safe() and check if SSE2 is safe
 #MEM_COPY_SSE2=1
 
+# disable Windows 98/Me code for TryEnterCriticalSection and call TryEnterCritical instead
+#CS_NATIVE_ONLY=1
+
 # Pass exta CFLAGS, please don't use -march= for old mingw, SSE runtime
 # is broken here!
 #TUNE=-march=core2
