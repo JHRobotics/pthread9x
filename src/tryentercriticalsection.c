@@ -145,10 +145,8 @@ L2:
 #endif
 
 typedef BOOL (WINAPI *tecs_f)(CRITICAL_SECTION* cs);
-typedef void (WINAPI *ecs_f)(CRITICAL_SECTION* cs);
 
 static tecs_f tecs_p = NULL;
-static ecs_f  ecs_p  = NULL;
 
 BOOL WINAPI TryEnterCriticalSectionNative(CRITICAL_SECTION* cs)
 {
@@ -159,7 +157,7 @@ BOOL WINAPI TryEnterCriticalSectionNative(CRITICAL_SECTION* cs)
 	if(major <= 4)
 	{
 #ifndef CS_NATIVE_ONLY
-		if(minor == 10 || minor == 90)
+		if(minor == 10 || minor == 90) /* 98 + Me*/
 		{
 			WIN_CRITICAL_SECTION* mycs = (WIN_CRITICAL_SECTION*) cs;
 			if (mycs->Type != K32OBJ_CRITICAL_SECTION)
@@ -172,20 +170,8 @@ BOOL WINAPI TryEnterCriticalSectionNative(CRITICAL_SECTION* cs)
 		else
 #endif
 		{
-			if(ecs_p == NULL)
-			{
-				HMODULE hK = GetModuleHandleA("kernel32.dll");
-				if(hK)
-				{
-					ecs_p = (ecs_f)GetProcAddress(hK, "EnterCriticalSection");
-				}
-			}
-			
-			if(ecs_p != NULL)
-			{
-				ecs_p(cs);
-				return TRUE;
-			}
+			EnterCriticalSection(cs);
+			return TRUE;
 		}
 	}
 	else if(major > 4)

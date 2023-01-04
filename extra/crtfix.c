@@ -143,4 +143,11 @@ BOOL WINAPI __dyn_tls_init (HANDLE hDllHandle, DWORD dwReason, LPVOID lpreserved
 
 const PIMAGE_TLS_CALLBACK __dyn_tls_init_callback = (const PIMAGE_TLS_CALLBACK) __dyn_tls_init;
 
+int __mingw_initltsdrot_force = 0;
+int __mingw_initltsdyn_force = 0;
+int __mingw_initltssuo_force = 0;
+int mingw_initltsdrot_force = 0;
+int mingw_initltsdyn_force = 0;
+int mingw_initltssuo_force = 0;
+
 #endif
