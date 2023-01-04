@@ -50,6 +50,10 @@ else
     DEFS += -DCS_NATIVE_ONLY
   endif
 
+  ifdef NO_STATIC_TLS_REMOVE
+    DEFS += -DNO_STATIC_TLS_REMOVE
+  endif
+
   ifdef SPEED
     CFLAGS = -std=gnu99 -O3 -fno-exceptions $(TUNE) $(INCLUDE) -DNDEBUG $(DEFS)
     LDLAGS = -fno-exceptions

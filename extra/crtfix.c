@@ -132,5 +132,15 @@ _onexit_t __dllonexit (_onexit_t func, _PVFV ** pbegin, _PVFV ** pend)
 
 }
 
-
 #endif /* #ifdef NEW_ALLOC */
+
+#ifndef NO_STATIC_TLS_REMOVE
+
+BOOL WINAPI __dyn_tls_init (HANDLE hDllHandle, DWORD dwReason, LPVOID lpreserved)
+{
+  return TRUE;
+}
+
+const PIMAGE_TLS_CALLBACK __dyn_tls_init_callback = (const PIMAGE_TLS_CALLBACK) __dyn_tls_init;
+
+#endif

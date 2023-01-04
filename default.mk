@@ -25,6 +25,9 @@ DEFAULT_HEAP=1
 # disable Windows 98/Me code for TryEnterCriticalSection and call TryEnterCritical instead
 #CS_NATIVE_ONLY=1
 
+# disable static TLS remove if it break something important
+#NO_STATIC_TLS_REMOVE=1
+
 # Pass exta CFLAGS, please don't use -march= for old mingw, SSE runtime
 # is broken here!
 #TUNE=-march=core2
