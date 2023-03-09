@@ -324,7 +324,7 @@ void *calloc(size_t num, size_t size)
 	void *ptr;
 	if(total == 0)
 	{
-		size = MEM_ALIGN;
+		total = MEM_ALIGN;
 	}
 	AROUND(total, MEM_ALIGN);
 	
