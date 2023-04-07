@@ -110,9 +110,12 @@ static memcpy_func memcpy_fast = memcpy_c;
 static zeromem_func zeromem_fast = zeromem_c;
 
 #ifdef MEM_COPY_SSE2
-
-#pragma GCC push_options
-#pragma GCC target ("arch=core2")
+# pragma GCC push_options
+# if __GNUC__ > 4
+#  pragma GCC target("sse2")
+# else
+#  pragma GCC target ("arch=core2")
+# endif
 
 static void memcpy_sse2(void *dst, void *src, size_t size)
 {
@@ -141,7 +144,7 @@ static void zeromem_sse2(void *dst, size_t size)
 	}
 }
 
-#pragma GCC pop_options
+# pragma GCC pop_options
 #endif
 
 void crt_enable_sse2()
