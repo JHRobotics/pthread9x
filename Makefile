@@ -55,11 +55,16 @@ else
   endif
 
   ifdef SPEED
-    CFLAGS = -std=gnu99 -O3 -fno-exceptions -ffast-math $(INCLUDE) -DNDEBUG $(DEFS)
+    CFLAGS = -std=gnu99 -O3 -fno-exceptions $(PT_TUNE) $(INCLUDE) -DNDEBUG $(DEFS)
     LDLAGS = -fno-exceptions
   else
-    CFLAGS = -std=gnu99 -O0 -g -ffast-math $(INCLUDE) -DDEBUG -DWINPTHREAD_DBG=1 $(DEFS)
-    LDLAGS = 
+    ifdef DEBUG
+      CFLAGS = -std=gnu99 -O0 $(INCLUDE) $(PT_TUNE) -DDEBUG -DWINPTHREAD_DBG=1 $(DEFS)
+      LDLAGS = 
+    else
+      CFLAGS = -std=gnu99 -O0 -fno-exceptions $(PT_TUNE) $(INCLUDE) -DNDEBUG $(DEFS)
+      LDLAGS = -fno-exceptions
+    endif
   endif
 
   %.c.o: %.c $(DEPS)
