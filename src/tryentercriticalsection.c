@@ -62,6 +62,7 @@ BOOL init_tryentercritsec()
 		tesc_offset = 0x88 - 0x8;
 		return TRUE;
 	}
+	// FIXME: 95
 	return FALSE;
 }
 
@@ -106,7 +107,7 @@ __asm__(".text\n\t"
 # else
 #  define CS_NATIVE_ONLY
 # endif
-#else
+#elif !(defined(_WIN64) || defined(_M_ARM))
 
 __declspec(naked) BOOL WINAPI TryEnterCrst(CRIT_SECT* crit)
 {
@@ -150,11 +151,13 @@ static tecs_f tecs_p = NULL;
 
 BOOL WINAPI TryEnterCriticalSectionNative(CRITICAL_SECTION* cs)
 {
+#if !(defined(_WIN64) || defined(_M_ARM))
 	DWORD GV = GetVersion();
 	DWORD major = (DWORD)(LOBYTE(LOWORD(GV)));
-  DWORD minor = (DWORD)(HIBYTE(LOWORD(GV)));
+	DWORD minor = (DWORD)(HIBYTE(LOWORD(GV)));
+	DWORD isNT = (int) GV >= 0;
 	
-	if(major <= 4)
+	if(!isNT || major < 4)
 	{
 #ifndef CS_NATIVE_ONLY
 		if(minor == 10 || minor == 90) /* 98 + Me*/
@@ -167,21 +170,21 @@ BOOL WINAPI TryEnterCriticalSectionNative(CRITICAL_SECTION* cs)
 			
 			return TryEnterCrst(mycs->crit);
 		}
-		else
+		else // FIXME: 95, NT3, Win32s
 #endif
 		{
 			EnterCriticalSection(cs);
 			return TRUE;
 		}
 	}
-	else if(major > 4)
+	else
 	{
 		if(tecs_p == NULL)
 		{
 			HMODULE hK = GetModuleHandleA("kernel32.dll");
 			if(hK)
 			{
-				tecs_p = (tecs_f)GetProcAddress(hK, "TryEnterCriticalSection");
+				tecs_p = (tecs_f)GetProcAddress(hK, "TryEnterCriticalSection"); // Note: 98 & ME exports this as a stub
 			}
 		}
 		
@@ -194,6 +197,9 @@ BOOL WINAPI TryEnterCriticalSectionNative(CRITICAL_SECTION* cs)
 	RaiseException(STATUS_ACCESS_VIOLATION, 0, 0, NULL);
 	
 	return FALSE;
+#else
+	return TryEnterCriticalSection(cs);
+#endif
 }
 
 /* MAKE_EXPORT TryEnterCriticalSection_new=TryEnterCriticalSection */
