@@ -46,9 +46,9 @@ typedef struct _WIN_CRITICAL_SECTION
 } WIN_CRITICAL_SECTION, *PWIN_CRITICAL_SECTION;
 
 //static DWORD _offset;
-DWORD tesc_offset;
+DWORD tesc_offset = 0;
 
-BOOL init_tryentercritsec()
+static BOOL init_tryentercritsec()
 {
 	DWORD GV = GetVersion();
 	
@@ -168,6 +168,7 @@ BOOL WINAPI TryEnterCriticalSectionNative(CRITICAL_SECTION* cs)
 				RaiseException(STATUS_ACCESS_VIOLATION, 0, 0, NULL);
 			}
 			
+			init_tryentercritsec();
 			return TryEnterCrst(mycs->crit);
 		}
 		else // FIXME: 95, NT3, Win32s
@@ -213,6 +214,7 @@ BOOL WINAPI TryEnterCriticalSection9x(CRITICAL_SECTION* cs)
 		return TryEnterCriticalSectionNative(cs);
 	}
 	
+	init_tryentercritsec();
 	return TryEnterCrst(mycs->crit);
 #else
 	return TryEnterCriticalSectionNative(cs);
