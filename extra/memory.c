@@ -428,26 +428,26 @@ __declspec(dllimport) char *_strdup(const char *str1)
 
 char *strndup(const char *str1, size_t size)
 {
-	size_t len = strlen(str1);
-	
-	if(size == 0)
+	size_t len;
+	for(len = 0; len < size; len++)
 	{
-		return NULL;
+		if(str1[len] == '\0')
+		{
+			break;
+		}
 	}
 	
-	if(len > size-1)
+	if(size == 0 || len == 0)
 	{
-		len = size-1;
+		return NULL;
 	}
 	
 	char *str2 = malloc(len+1);
 	if(str2 != NULL)
 	{
-		memcpy(str2, str1, len+1);
+		memcpy(str2, str1, len);
+		str2[len] = '\0';
 	}
-	
-	str2[len] = '\0';
-	
 	return str2;
 }
 
