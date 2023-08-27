@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <ctype.h>
 #include <io.h>
+#include <lockex.h>
 
 BOOL WINAPI TryEnterCriticalSection9x(CRITICAL_SECTION* cs);
 
@@ -13,21 +14,22 @@ __declspec(dllimport) BOOL WINAPI TryEnterCriticalSection(LPCRITICAL_SECTION lpC
 }
 
 static unsigned int crt_locks_num = 0;
-CRITICAL_SECTION *crt_locks = NULL;
+static CRITICAL_SECTION crt_locks[LOCK_TOTAL_MAX];
 
 void crt_locks_init(int count)
 {
 	int i;
-	if(count > crt_locks_num)
+	int count_in = count+LOCK_INTERNAL_CNT;
+	if(count_in > crt_locks_num)
 	{
-		crt_locks = realloc(crt_locks, sizeof(CRITICAL_SECTION) * crt_locks_num);
+		//crt_locks = realloc(crt_locks, sizeof(CRITICAL_SECTION) * crt_locks_num);
 		
-		for(i = crt_locks_num; i < count; i++)
+		for(i = crt_locks_num; i < count_in; i++)
 		{
 			InitializeCriticalSection(crt_locks+i);
 		}
 		
-		crt_locks_num = count;
+		crt_locks_num = count_in;
 	}
 }
 
@@ -44,16 +46,18 @@ void crt_locks_destroy()
 
 void crt_lock(int lock_no)
 {
-	if(lock_no < crt_locks_num)
+	int lock_no_in = lock_no + LOCK_INTERNAL_CNT;
+	if(lock_no_in < crt_locks_num)
 	{
-		EnterCriticalSection(crt_locks+lock_no);
+		EnterCriticalSection(crt_locks+lock_no_in);
 	}
 }
 
 void crt_unlock(int lock_no)
 {
-	if(lock_no < crt_locks_num)
+	int lock_no_in = lock_no + LOCK_INTERNAL_CNT;
+	if(lock_no_in < crt_locks_num)
 	{
-		LeaveCriticalSection(crt_locks+lock_no);
+		LeaveCriticalSection(crt_locks+lock_no_in);
 	}
 }

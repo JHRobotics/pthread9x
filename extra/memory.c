@@ -6,6 +6,8 @@
 
 #include <cpuid.h>
 
+#include <lockex.h>
+
 // include SSE2 intrinsics require some target switching
 #ifdef MEM_COPY_SSE2
 #pragma GCC push_options
@@ -233,6 +235,7 @@ static inline void *malloc_int(size_t size)
 	
 	hsize = size + sizeof(memblk_t) + MEM_ALIGN - 1;
 	
+	crt_lock(LOCK_INTERNAL_MEM);
 	heap = GetHeap(size);
 	
 	hptr = HeapAlloc(heap, 0, hsize);
@@ -248,9 +251,11 @@ static inline void *malloc_int(size_t size)
 		mem->heap_ptr = hptr;
 		mem->mem_size = size;
 		
+		crt_unlock(LOCK_INTERNAL_MEM);
 		return mem+1;
 	}
 	
+	crt_unlock(LOCK_INTERNAL_MEM);
 	return NULL;
 }
 
@@ -346,7 +351,9 @@ void free(void *ptr)
 	{
 		memblk_t *mem = ((memblk_t*)ptr)-1;
 		
+		crt_lock(LOCK_INTERNAL_MEM);
 		HeapFree(mem->heap, 0, mem->heap_ptr);
+		crt_unlock(LOCK_INTERNAL_MEM);
 	}
 }
 
@@ -360,13 +367,16 @@ __declspec(dllimport) void* _expand(void* ptr, size_t new_size)
 	
 		hsize = (uint8_t*)ptr - mem->heap_ptr + new_size;
 		
+		crt_lock(LOCK_INTERNAL_MEM);
 		tmp = HeapReAlloc(mem->heap, HEAP_REALLOC_IN_PLACE_ONLY, mem->heap_ptr, hsize);
 		
 		if(tmp)
 		{
 			mem->mem_size = new_size;
+			crt_unlock(LOCK_INTERNAL_MEM);
 			return ptr;
 		}
+		crt_unlock(LOCK_INTERNAL_MEM);
 	}
 	
 	return NULL;
