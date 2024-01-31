@@ -165,18 +165,20 @@ BOOL WINAPI TryEnterCriticalSectionNative(CRITICAL_SECTION* cs)
 			WIN_CRITICAL_SECTION* mycs = (WIN_CRITICAL_SECTION*) cs;
 			if (mycs->Type != K32OBJ_CRITICAL_SECTION)
 			{
-				RaiseException(STATUS_ACCESS_VIOLATION, 0, 0, NULL);
+				//RaiseException(STATUS_ACCESS_VIOLATION, 0, 0, NULL);
+				// JH: maybe CS isn't iniciated yet...
+				InitializeCriticalSection(cs);
 			}
 			
-			init_tryentercritsec();
-			return TryEnterCrst(mycs->crit);
+			if(init_tryentercritsec())
+			{
+				return TryEnterCrst(mycs->crit);
+			}
 		}
-		else // FIXME: 95, NT3, Win32s
+		// else FIXME: 95, NT3, Win32s
 #endif
-		{
-			EnterCriticalSection(cs);
-			return TRUE;
-		}
+		EnterCriticalSection(cs);
+		return TRUE;
 	}
 	else
 	{
@@ -206,17 +208,5 @@ BOOL WINAPI TryEnterCriticalSectionNative(CRITICAL_SECTION* cs)
 /* MAKE_EXPORT TryEnterCriticalSection_new=TryEnterCriticalSection */
 BOOL WINAPI TryEnterCriticalSection9x(CRITICAL_SECTION* cs)
 {
-#if 0
-	WIN_CRITICAL_SECTION* mycs = (WIN_CRITICAL_SECTION*) cs;
-	if (mycs->Type != K32OBJ_CRITICAL_SECTION)
-	{
-		//RaiseException(STATUS_ACCESS_VIOLATION, 0, 0, NULL);
-		return TryEnterCriticalSectionNative(cs);
-	}
-	
-	init_tryentercritsec();
-	return TryEnterCrst(mycs->crit);
-#else
 	return TryEnterCriticalSectionNative(cs);
-#endif
 }
