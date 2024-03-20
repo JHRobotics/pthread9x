@@ -188,7 +188,7 @@ static int windows_sse_support()
     // 2k     - 5.0
     //printf("Version is %d.%d (%d)\n", dwMajorVersion, dwMinorVersion, dwBuild);
 		
-		if(dwMajorVersion > 5)
+		if(dwMajorVersion >= 5)
 		{
 			return 1;
 		}

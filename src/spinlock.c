@@ -78,7 +78,9 @@ static_spin_init (pthread_spinlock_t* lock)
 
 /* Windows 98/Me hasn't SetCriticalSectionSpinCount but has
    InitializeCriticalSectionAndSpinCount
-   Windows NT/95 hasn't enyone, so call SetCritical only
+   Windows NT/95 hasn't enyone, so call SetCritical only.
+   MSDN: "On single-processor systems, the spin count is ignored and the critical section spin count is set to zero (0)."
+   ... so for Win9x ignore it anyway and call only InitializeCriticalSection
 */
 typedef BOOL (WINAPI *ICSASCFunc)(LPCRITICAL_SECTION lpCriticalSection, DWORD dwSpinCount);
 static ICSASCFunc ICSASCProc = NULL;
@@ -103,11 +105,15 @@ pthread_spin_init (pthread_spinlock_t *lock, int pshared)
   
   if(!ICSASCSearch)
   {
-	  HANDLE hKernel32 = GetModuleHandleA("kernel32.dll");
-	  if(hKernel32)
+  	DWORD GV = GetVersion();
+  	if((DWORD)(LOBYTE(LOWORD(GV))) >= 5) /* only for 2k, XP ... */
   	{
-		  ICSASCProc = (ICSASCFunc)GetProcAddress(hKernel32, "InitializeCriticalSectionAndSpinCount");
-  	}
+	  	HANDLE hKernel32 = GetModuleHandleA("kernel32.dll");
+		  if(hKernel32)
+	  	{
+			  ICSASCProc = (ICSASCFunc)GetProcAddress(hKernel32, "InitializeCriticalSectionAndSpinCount");
+	  	}
+	  }
   	ICSASCSearch = TRUE;
   }
   

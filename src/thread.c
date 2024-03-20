@@ -1650,6 +1650,8 @@ pthread_join (pthread_t t, void **res)
     return EINVAL;
   if (pthread_equal(pthread_self(), t))
     return EDEADLK;
+    
+  (void)dwFlags; /* mute warning */
 
   /* pthread_testcancel (); */
   if (tv->ended == 0 || (tv->h != NULL && tv->h != INVALID_HANDLE_VALUE))
@@ -1683,6 +1685,8 @@ _pthread_tryjoin (pthread_t t, void **res)
       pthread_mutex_unlock (&mtx_pthr_locked);
       return ESRCH;
     }
+  
+  (void)dwFlags; /* mute warning */
 
   if ((tv->p_state & PTHREAD_CREATE_DETACHED) != 0)
     {
@@ -1736,6 +1740,9 @@ pthread_detach (pthread_t t)
       pthread_mutex_unlock (&mtx_pthr_locked);
       return ESRCH;
     }
+    
+  (void)dwFlags; /* mute warning */
+    
   if ((tv->p_state & PTHREAD_CREATE_DETACHED) != 0)
     {
       pthread_mutex_unlock (&mtx_pthr_locked);

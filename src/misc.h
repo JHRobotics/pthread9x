@@ -76,8 +76,8 @@ typedef long LONGBAG;
 
 #define CHECK_OBJECT(o, e)  { DWORD dwFlags; \
     if (!(o)) return e; \
-    if (!((o)->h) || (((o)->h) == INVALID_HANDLE_VALUE) || !GetHandleInformation(((o)->h), &dwFlags)) \
-        return e; }
+    if (!((o)->h) || (((o)->h) == INVALID_HANDLE_VALUE) || !GetHandleInformation(((o)->h), &dwFlags)){ \
+        (void)dwFlags; return e; } }
 
 #define VALID(x)    if (!(p)) return EINVAL;
 
