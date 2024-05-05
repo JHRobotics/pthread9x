@@ -225,7 +225,7 @@ int crt_sse2_is_safe()
 	return 0;
 }
 
-static inline void *malloc_int(size_t size)
+static inline void *malloc_int(size_t size, int alignment)
 {
 	size_t hsize;
 	uint8_t *hptr;
@@ -233,7 +233,7 @@ static inline void *malloc_int(size_t size)
 	uintptr_t p;
 	HANDLE heap;
 	
-	hsize = size + sizeof(memblk_t) + MEM_ALIGN - 1;
+	hsize = size + sizeof(memblk_t) + alignment - 1;
 	
 	crt_lock(LOCK_INTERNAL_MEM);
 	heap = GetHeap(size);
@@ -244,7 +244,7 @@ static inline void *malloc_int(size_t size)
 		p = (uintptr_t)hptr;
 		p += MEM_ALIGN - 1;
 		p += sizeof(memblk_t);
-		p &= ~((uintptr_t)(MEM_ALIGN - 1));
+		p &= ~((uintptr_t)(alignment - 1));
 		
 		mem = ((memblk_t*)p)-1;
 		mem->heap = heap;
@@ -259,20 +259,7 @@ static inline void *malloc_int(size_t size)
 	return NULL;
 }
 
-#ifdef NEW_ALLOC
-
-void *malloc(size_t size)
-{
-	if(size == 0)
-	{
-		size = MEM_ALIGN;
-	}
-	AROUND(size, MEM_ALIGN);
-		
-	return malloc_int(size);
-}
-
-void *realloc(void *ptr, size_t new_size)
+static inline void *realloc_int(void *ptr, size_t new_size, size_t alignment)
 {
 	memblk_t *mem;
 	size_t hsize;
@@ -280,9 +267,9 @@ void *realloc(void *ptr, size_t new_size)
 	
 	if(new_size == 0 && ptr == NULL)
 	{
-		new_size = MEM_ALIGN;
-		AROUND(new_size, MEM_ALIGN);
-		return malloc_int(new_size);
+		new_size = alignment;
+		AROUND(new_size, alignment);
+		return malloc_int(new_size, alignment);
 	}
 	else if(new_size == 0)
 	{
@@ -291,11 +278,11 @@ void *realloc(void *ptr, size_t new_size)
 	}
 	else if(ptr == NULL)
 	{
-		AROUND(new_size, MEM_ALIGN);
-		return malloc_int(new_size);
+		AROUND(new_size, alignment);
+		return malloc_int(new_size, alignment);
 	}
 	
-	AROUND(new_size, MEM_ALIGN);
+	AROUND(new_size, alignment);
 	
 	mem = ((memblk_t*)ptr)-1;
 	if(new_size == mem->mem_size)
@@ -313,7 +300,7 @@ void *realloc(void *ptr, size_t new_size)
 	}
 	else
 	{
-		tmp = malloc_int(new_size);
+		tmp = malloc_int(new_size, alignment);
 		if(tmp)
 		{
 			memcpy_fast(tmp, ptr, mem->mem_size);
@@ -326,6 +313,24 @@ void *realloc(void *ptr, size_t new_size)
 	return NULL;
 }
 
+#ifdef NEW_ALLOC
+
+void *malloc(size_t size)
+{
+	if(size == 0)
+	{
+		size = MEM_ALIGN;
+	}
+	AROUND(size, MEM_ALIGN);
+		
+	return malloc_int(size, MEM_ALIGN);
+}
+
+void *realloc(void *ptr, size_t new_size)
+{
+	return realloc_int(ptr, new_size, MEM_ALIGN);
+}
+
 void *calloc(size_t num, size_t size)
 {
 	size_t total = num*size;
@@ -336,7 +341,7 @@ void *calloc(size_t num, size_t size)
 	}
 	AROUND(total, MEM_ALIGN);
 	
-	ptr = malloc_int(total);
+	ptr = malloc_int(total, MEM_ALIGN);
   if(ptr != NULL)
   {
   	zeromem_fast(ptr, total);
@@ -449,6 +454,27 @@ char *strndup(const char *str1, size_t size)
 		str2[len] = '\0';
 	}
 	return str2;
+}
+
+void *_aligned_malloc9x(size_t size, size_t alignment)
+{
+	if(size == 0)
+	{
+		size = alignment;
+	}
+	AROUND(size, alignment);
+		
+	return malloc_int(size, alignment);
+}
+
+void *_aligned_realloc9x(void *memblock, size_t size, size_t alignment)
+{
+	return realloc_int(memblock, size, alignment);
+}
+
+void _aligned_free9x(void *memblock)
+{
+	free(memblock);
 }
 
 #endif /* NEW_ALLOC */

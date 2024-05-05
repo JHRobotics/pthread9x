@@ -132,6 +132,28 @@ _onexit_t __dllonexit (_onexit_t func, _PVFV ** pbegin, _PVFV ** pend)
 
 }
 
+#if 0
+/* no in use yet */
+void *_aligned_malloc9x(size_t size, size_t alignment);
+void *_aligned_realloc9x(void *memblock, size_t size, size_t alignment);
+void _aligned_free9x(void *memblock);
+
+__declspec(dllimport) void *_aligned_malloc(size_t size, size_t alignment)
+{
+	return _aligned_malloc9x(size, alignment);
+}
+
+__declspec(dllimport) void *_aligned_realloc(void *memblock, size_t size, size_t alignment)
+{
+	return _aligned_realloc9x(memblock, size, alignment);
+}
+
+__declspec(dllimport) void _aligned_free(void *memblock)
+{
+	_aligned_free9x(memblock);
+}
+#endif
+
 #endif /* #ifdef NEW_ALLOC */
 
 #ifndef NO_STATIC_TLS_REMOVE
