@@ -458,6 +458,11 @@ char *strndup(const char *str1, size_t size)
 
 void *_aligned_malloc9x(size_t size, size_t alignment)
 {
+	if(alignment < 4)
+	{
+		alignment = 4;
+	}
+	
 	if(size == 0)
 	{
 		size = alignment;
@@ -469,6 +474,11 @@ void *_aligned_malloc9x(size_t size, size_t alignment)
 
 void *_aligned_realloc9x(void *memblock, size_t size, size_t alignment)
 {
+	if(alignment < 4)
+	{
+		alignment = 4;
+	}
+	
 	return realloc_int(memblock, size, alignment);
 }
 
