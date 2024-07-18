@@ -21,6 +21,10 @@
 #define MEM_ALIGN 16
 #endif
 
+#ifndef MEM_MIN_ALIGN
+#define MEM_MIN_ALIGN MEM_ALIGN
+#endif
+
 #if MEM_ALIGN != 4 && MEM_ALIGN != 8 && MEM_ALIGN != 16 && MEM_ALIGN != 32 && MEM_ALIGN != 64 && MEM_ALIGN != 128
 #error "Wrong memory aligment!"
 #endif
@@ -242,7 +246,7 @@ static inline void *malloc_int(size_t size, int alignment)
 	if(hptr != NULL)
 	{
 		p = (uintptr_t)hptr;
-		p += MEM_ALIGN - 1;
+		p += alignment - 1;
 		p += sizeof(memblk_t);
 		p &= ~((uintptr_t)(alignment - 1));
 		
@@ -458,9 +462,9 @@ char *strndup(const char *str1, size_t size)
 
 void *_aligned_malloc9x(size_t size, size_t alignment)
 {
-	if(alignment < 4)
+	if(alignment < MEM_MIN_ALIGN)
 	{
-		alignment = 4;
+		alignment = MEM_MIN_ALIGN;
 	}
 	
 	if(size == 0)
