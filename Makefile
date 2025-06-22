@@ -62,7 +62,7 @@ else
       CFLAGS = -std=gnu99 -O0 $(INCLUDE) $(PT_TUNE) -DDEBUG -DWINPTHREAD_DBG=1 $(DEFS)
       LDLAGS = 
     else
-      CFLAGS = -std=gnu99 -O0 -fno-exceptions $(PT_TUNE) $(INCLUDE) -DNDEBUG $(DEFS)
+      CFLAGS = -std=gnu99 -O2 -fno-exceptions $(PT_TUNE) $(INCLUDE) -DNDEBUG $(DEFS)
       LDLAGS = -fno-exceptions
     endif
   endif
