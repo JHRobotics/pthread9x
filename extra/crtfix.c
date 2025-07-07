@@ -175,3 +175,4 @@ int mingw_initltssuo_force = 0;
 #endif
 
 #include "int64.c"
+#include "linkfix.c"
