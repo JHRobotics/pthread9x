@@ -38,6 +38,10 @@ else
     DEFS += -DDEFAULT_HEAP
   endif
   
+  ifdef WIN9XSMP
+  	DEFS += -DWIN9XSMP
+  endif
+  
   ifdef MEM_ALIGN
     DEFS += -DMEM_ALIGN=$(MEM_ALIGN)
   endif

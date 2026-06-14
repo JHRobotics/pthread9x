@@ -205,8 +205,11 @@ BOOL WINAPI TryEnterCriticalSectionNative(CRITICAL_SECTION* cs)
 #endif
 }
 
+
+#ifndef WIN9XSMP
 /* MAKE_EXPORT TryEnterCriticalSection_new=TryEnterCriticalSection */
 BOOL WINAPI TryEnterCriticalSection9x(CRITICAL_SECTION* cs)
 {
 	return TryEnterCriticalSectionNative(cs);
 }
+#endif

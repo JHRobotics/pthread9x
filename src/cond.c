@@ -316,7 +316,11 @@ pthread_cond_destroy (pthread_cond_t *c)
     }*/
   //EnterCriticalSection (&_c->waiters_count_lock_);
   //do_sema_b_release (_c->sema_b, 1,&_c->waiters_b_lock_,&_c->value_b);
+#ifdef WIN9XSMP
+  if (!TryEnterCriticalSection (&_c->waiters_count_lock_))
+#else
   if (!TryEnterCriticalSection9x (&_c->waiters_count_lock_))
+#endif
     {
        do_sema_b_release (_c->sema_b, 1,&_c->waiters_b_lock_,&_c->value_b);
        return EBUSY;

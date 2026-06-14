@@ -690,7 +690,9 @@ int                        WINPTHREAD_API pthread_rwlockattr_setpshared(pthread_
 #endif
 
 #ifdef WINAPI
+#ifndef WIN9XSMP
 BOOL WINAPI TryEnterCriticalSection9x(CRITICAL_SECTION* cs);
+#endif
 #endif
 
 #endif /* WIN_PTHREADS_H */

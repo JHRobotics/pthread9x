@@ -200,10 +200,12 @@ pthread_spin_trylock (pthread_spinlock_t *lock)
     return rv;
 
   spin = (spin_t*)*lock;
-  /*if (!TryEnterCriticalSection (&spin->section))
-      return EBUSY;*/
-  //EnterCriticalSection(&spin->section);
+
+#ifdef WIN9XSMP
+  if (!TryEnterCriticalSection (&spin->section))
+#else
   if (!TryEnterCriticalSection9x (&spin->section))
+#endif
       return EBUSY;
       
   spin->owner = GetCurrentThreadId ();

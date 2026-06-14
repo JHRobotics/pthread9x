@@ -6,13 +6,6 @@
 #include <io.h>
 #include <lockex.h>
 
-BOOL WINAPI TryEnterCriticalSection9x(CRITICAL_SECTION* cs);
-
-__declspec(dllimport) BOOL WINAPI TryEnterCriticalSection(LPCRITICAL_SECTION lpCriticalSection)
-{
-	return TryEnterCriticalSection9x(lpCriticalSection);
-}
-
 static unsigned int crt_locks_num = 0;
 static CRITICAL_SECTION crt_locks[LOCK_TOTAL_MAX];
 static int crt_locks_cnt[LOCK_TOTAL_MAX] = {0}; /* number of 'init' of individual locks */
