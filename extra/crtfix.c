@@ -42,7 +42,11 @@ BOOL WINAPI IsProcessorFeaturePresent(DWORD ProcessorFeature)
 void __fastfail(unsigned int code);
 
 void __cdecl __attribute__((__noreturn__)) __chk_fail(void) {
+#ifndef WIN9XSMP
   if (IsProcessorFeaturePresent95(PF_FASTFAIL_AVAILABLE)) {
+#else
+  if (IsProcessorFeaturePresent(PF_FASTFAIL_AVAILABLE)) {
+#endif
     __fastfail(FAST_FAIL_RANGE_CHECK_FAILURE);
   } else {
     TerminateProcess(GetCurrentProcess(), STATUS_STACK_BUFFER_OVERRUN);
