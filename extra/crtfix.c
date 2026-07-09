@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <io.h>
 
+#ifndef WIN9XSMP
 typedef BOOL (WINAPI *IsProcessorFeaturePresent_func)(DWORD ProcessorFeature);
 static IsProcessorFeaturePresent_func IsProcessorFeaturePresent_proc = NULL;
 static BOOL IsProcessorFeaturePresent_set = FALSE;
@@ -33,6 +34,7 @@ BOOL WINAPI IsProcessorFeaturePresent(DWORD ProcessorFeature)
 {
 	return IsProcessorFeaturePresent95(ProcessorFeature);
 }
+#endif
 
 /* Don't use this on mingw 4.x.x */
 #if __GNUC__ > 4
