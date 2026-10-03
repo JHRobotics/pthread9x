@@ -27,15 +27,8 @@
 extern "C" {
 #endif
 
-#if defined DLL_EXPORT && !defined (WINPTHREAD_EXPORT_ALL_DEBUG)
-#ifdef IN_WINPTHREAD
-#define WINPTHREAD_SEMA_API __declspec(dllexport)
-#else
-#define WINPTHREAD_SEMA_API __declspec(dllimport)
-#endif
-#else
+/* static lib only */
 #define WINPTHREAD_SEMA_API
-#endif
 
 /* Set this to 0 to disable it */
 #define USE_SEM_CriticalSection_SpinCount	100

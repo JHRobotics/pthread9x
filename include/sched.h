@@ -49,15 +49,8 @@ struct sched_param {
 extern "C" {
 #endif
 
-#if defined DLL_EXPORT && !defined (WINPTHREAD_EXPORT_ALL_DEBUG)
-#ifdef IN_WINPTHREAD
-#define WINPTHREAD_SCHED_API __declspec(dllexport)
-#else
-#define WINPTHREAD_SCHED_API __declspec(dllimport)
-#endif
-#else
+/* static lib only */
 #define WINPTHREAD_SCHED_API
-#endif
 
 int WINPTHREAD_SCHED_API sched_yield(void);
 int WINPTHREAD_SCHED_API sched_get_priority_min(int pol);
